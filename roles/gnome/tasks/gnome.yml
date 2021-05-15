@@ -10,13 +10,17 @@
     - gnome-usage
     - gnome-multi-writer
     - adwaita-icon-theme
-    - chrome-gnome-shell
     - xdg-user-dirs-gtk
     - fwupd
     - arc-gtk-theme
     - gdm
+    - nautilus
+    - gnome-terminal
+    - firefox
 
 - name: enable display manager service on start
   systemd:
     name: gdm
     enabled: yes
+  when:
+    - ansible_facts['is_chroot'] is false
