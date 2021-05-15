@@ -1,0 +1,73 @@
+---
+arch_hostname: arch
+arch_timezone: America/Sao_Paulo
+arch_locale: en_US.UTF-8
+arch_keymap: us
+arch_proxy_country: BR
+
+arch_dns_servers:
+  - "8.8.8.8#dns.google"
+  - "8.8.4.4#dns.google"
+arch_dns_over_tls: yes
+
+arch_partitions:
+  /dev/sda:
+    - {
+        index: 1,
+        name: boot,
+        fs: vfat,
+        fs_opts: -F32,
+        part_end: 256MB,
+        flags: [boot,esp],
+        mount: /boot
+    }
+    - {
+        index: 2,
+        name: main,
+        part_start: 256MB,
+        flags: [lvm],
+        lvm_group: arch,
+        lvm_partitions: [
+          {
+            lv: root,
+            fs: ext4,
+            size: 100%FREE,
+            mount: /
+          }
+        ]
+    }
+
+arch_pacstrap:
+  - base
+  - base-devel
+  - linux
+  - linux-firmware
+  - python
+  - sudo
+
+arch_kernel_parameters:
+  - base
+  - udev
+  - autodetect
+  - keyboard
+  - keymap
+  - modconf
+  - block
+  - lvm2
+  - filesystems
+  - fsck
+
+arch_additional_packages:
+  - vim
+
+arch_user_name: bsmk
+arch_user_comment: Gustavo Bosmak
+arch_user_password: "$6$3eU136PWsGZNg$KkkG3b/HtKo7q9FdaQ1ESDAq/8GISH/fvA/qya2BgEO7bPzrMN2TRqwubhgoiiVr1Wtqw0sM.8UOki2yPT9sb1"
+arch_user_groups:
+  - wheel
+  - uucp
+  - video
+  - audio
+  - storage
+  - games
+  - input

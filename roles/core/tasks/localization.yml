@@ -1,0 +1,24 @@
+---
+
+- name: uncomment locales on /etc/locale.gen
+  replace:
+    path: /etc/locale.gen
+    regexp: "#{{ arch_locale }}"
+    replace: "{{ arch_locale }}"
+
+- name: generate locales
+  command: locale-gen
+
+- name: create /etc/locale.conf
+  ansible.builtin.template:
+    src: templates/locale.conf.j2
+    dest: /etc/locale.conf
+    owner: root
+    group: root
+
+- name: create /etc/vconsole.conf
+  ansible.builtin.template:
+    src: templates/vconsole.conf.j2
+    dest: /etc/vconsole.conf
+    owner: root
+    group: root

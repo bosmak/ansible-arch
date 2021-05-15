@@ -1,0 +1,18 @@
+---
+
+- name: get uuid for the disk
+  command: blkid -s UUID -o value "{{ partition.disk }}"
+  register: disk_uuid
+  changed_when: false
+
+- name: create folder for the boot mount
+  file:
+    path: "{{ partition.path }}"
+    state: directory
+
+- name: mount volumes
+  mount:
+    path: "{{ partition.path }}"
+    src: UUID={{ disk_uuid.stdout }}
+    fstype: "{{ partition.fs }}"
+    state: mounted

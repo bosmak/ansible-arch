@@ -1,0 +1,22 @@
+- name: install
+  pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - gnome
+    - gnome-tweaks
+    - nautilus-sendto
+    - gnome-nettool
+    - gnome-usage
+    - gnome-multi-writer
+    - adwaita-icon-theme
+    - chrome-gnome-shell
+    - xdg-user-dirs-gtk
+    - fwupd
+    - arc-gtk-theme
+    - gdm
+
+- name: enable display manager service on start
+  systemd:
+    name: gdm
+    enabled: yes

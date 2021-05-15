@@ -1,0 +1,58 @@
+{
+    "variables": {
+        "iso_date": "{{isotime \"2006.01\"}}",
+        "iso_mirror_url": "http://archlinux.c3sl.ufpr.br/iso",
+        "iso_url": "{{ user `iso_mirror_url` }}/{{ user `iso_date` }}.01/archlinux-{{ user `iso_date` }}.01-x86_64.iso",
+        "iso_checksum_url": "{{ user `iso_mirror_url` }}/{{ user `iso_date` }}.01/sha1sums.txt",
+        "iso_checksum_type": "sha1",
+        "ssh_timeout": "15m",
+        "boot_wait": "2s",
+        "cpus": "4",
+        "memory": "4096",
+        "vram": "64",
+        "headless": "false"
+    },
+    "builders": [
+        {
+            "type": "virtualbox-iso",
+            "iso_url": "{{ user `iso_url` }}",
+            "iso_checksum": "file:{{ user `iso_checksum_url` }}",
+            "iso_interface": "sata",
+            "guest_os_type": "ArchLinux_64",
+            "guest_additions_mode": "disable",
+            "http_directory": ".",
+            "cpus": "{{ user `cpus` }}",
+            "memory": "{{ user `memory` }}",
+            "vboxmanage": [
+                [ "modifyvm", "{{.Name}}", "--firmware", "EFI" ],
+                [ "modifyvm", "{{.Name}}", "--rtcuseutc", "ON" ],
+                [ "modifyvm", "{{.Name}}", "--vram", "{{ user `vram` }}" ]
+            ],
+            "boot_wait": "{{ user `boot_wait` }}",
+            "boot_command": [
+                "<up><up><enter><enter><wait45><enter>",
+                "mkdir -p /root/.ssh/<enter>",
+                "echo \"{{ .SSHPublicKey }}\" > /root/.ssh/authorized_keys<enter>",
+                "systemctl start sshd<enter>",
+                "clear<enter>",
+                "/usr/bin/curl http://{{ .HTTPIP }}:{{ .HTTPPort }}/archive.tar.gz --output archive.tar.gz && ",
+                "mkdir -p ansible-archlinux && ",
+                "tar xzvf archive.tar.gz -C ansible-archlinux/<enter>",
+                "cd ansible-archlinux && ./install.sh<enter>"
+            ],
+            "disk_size": 20480,
+            "hard_drive_interface": "sata",
+            "ssh_username": "root",
+            "ssh_timeout": "{{ user `ssh_timeout` }}",
+            "shutdown_command": "sudo -S shutdown -P now",
+            "skip_export": true,
+            "headless" : "{{ user `headless`}}"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "breakpoint",
+            "note": "Minor debugging after installed. In the future some tests may be implemented to automate this manual check."
+         }
+    ]
+}

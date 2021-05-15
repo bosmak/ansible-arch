@@ -1,0 +1,42 @@
+---
+
+- name: configure sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) ALL'
+    validate: 'visudo -cf %s'
+    state: present
+
+- name: create user
+  ansible.builtin.user:
+    name: "{{ arch_user_name }}"
+    comment: "{{ arch_user_comment }}"
+    password: "{{ arch_user_password }}"
+    groups: "{{ arch_user_groups | join(',') }}"
+    #generate_ssh_key: yes
+    #ssh_key_bits: 4096
+    #ssh_key_file: .ssh/id_rsa
+    append: yes
+    state: present
+
+- name: configure xdg
+  block:
+
+    - name: install
+      pacman:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - xdg-user-dirs
+        - xdg-utils
+
+    - name: Configure xdg-dirs layout
+      template:
+        src: user-dirs.defaults.j2
+        dest: /etc/xdg/user-dirs.defaults
+
+    - name: Generate xdg user structure
+      command: /usr/bin/xdg-user-dirs-update --force
+      become: yes
+      become_user: "{{ arch_user_name }}"

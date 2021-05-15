@@ -1,0 +1,19 @@
+---
+
+- name: Set up initramfs
+  block:
+    - name: install dependencies packages
+      pacman:
+        name: "{{ item }}"
+      loop: "{{ arch_kernel_parameters }}"
+      when:
+        - item == "lvm2"
+
+    - name: Add mkinitcpio.conf hooks
+      lineinfile:
+        dest: /etc/mkinitcpio.conf
+        regexp: ^HOOKS=
+        line: HOOKS=({{ arch_kernel_parameters | join(" ") }})
+
+    - name: generate initramfs
+      command: mkinitcpio -P

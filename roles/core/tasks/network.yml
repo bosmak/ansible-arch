@@ -1,0 +1,57 @@
+---
+
+- name: create /etc/hostname
+  ansible.builtin.template:
+    src: templates/hostname.j2
+    dest: /etc/hostname
+    owner: root
+    group: root
+
+- name: create /etc/hosts
+  ansible.builtin.template:
+    src: templates/hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+
+- name: configure systemd-resolved
+  block:
+
+    - name: create /etc/systemd/resolved.conf
+      template:
+        src: templates/resolved.conf.j2
+        dest: /etc/systemd/resolved.conf
+        owner: root
+        group: root
+
+    - name: enable systemd-resolved service on start
+      systemd:
+        name: systemd-resolved
+        enabled: yes
+
+    - name: Link /etc/resolv.conf to systemd-resolved stub when using chroot
+      delegate_to: localhost
+      file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: /mnt/etc/resolv.conf
+        force: yes
+        owner: root
+        group: root
+        state: link
+
+- name: configure network manager
+  block:
+
+    - name: install network manager
+      pacman:
+        name:  "{{ item }}"
+        update_cache: yes
+        state: present
+      loop:
+        - networkmanager
+        - network-manager-applet
+
+    - name: enable networkmanager on startup
+      systemd:
+        name: NetworkManager
+        enabled: yes

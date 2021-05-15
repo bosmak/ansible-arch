@@ -1,0 +1,8 @@
+# Control local DNS and LLMNR name resolution.
+# See resolved.conf(5) for details
+
+[Resolve]
+DNS={{ arch_dns_servers | join(" ") }}
+{%- if arch_dns_over_tls %}
+DNSOverTLS=yes
+{%- endif %}

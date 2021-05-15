@@ -1,0 +1,7 @@
+---
+
+- name: configure system time zone
+  command: ln -sf /usr/share/zoneinfo/"{{ arch_timezone }}" /etc/localtime
+
+- name: generate /etc/adjtime
+  command: hwclock --systohc

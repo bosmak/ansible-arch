@@ -1,0 +1,22 @@
+---
+
+- name: install systemd-boot
+  command: bootctl install
+
+- name: add loader configuration
+  ansible.builtin.template:
+    src: templates/bootloader/loader.conf.j2
+    dest: /boot/loader/loader.conf
+    owner: root
+    group: root
+
+- name: get root disk uuid
+  shell: blkid -s UUID -o value "$(df -h / | tail -n 1 | cut -d ' ' -f 1)"
+  register: root_disk_uuid
+
+- name: add bootloader entry
+  ansible.builtin.template:
+    src: templates/bootloader/entries.conf.j2
+    dest: "/boot/loader/entries/{{ arch_hostname }}.conf"
+    owner: root
+    group: root

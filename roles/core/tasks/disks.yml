@@ -1,0 +1,67 @@
+---
+
+- name: prepare {{ disk }} for installation
+  block:
+    - name: wipe disk to a clean state
+      command: find /dev -wholename "{{ disk }})*" -exec wipefs --force --all {} \;
+
+    - name: creating partitions for {{ disk }} disk
+      parted:
+        device: "{{ disk }}"
+        name: "{{ item.name | default(omit) }}"
+        label: gpt
+        number: "{{ item.index }}"
+        part_start: "{{ item.part_start | default(omit) }}"
+        part_end: "{{ item.part_end | default(omit) }}"
+        flags: "{{ item.flags }}"
+        state: present
+      loop: "{{ arch_partitions[disk] | sort(attribute='index') | flatten }}"
+
+    - name: append partition to the mount list
+      include_tasks: disks-order-mount.yml
+      loop: "{{ arch_partitions[disk] | sort(attribute='index') | flatten }}"
+      when: partition.mount is defined and partition.lvm_group is undefined
+      loop_control:
+        loop_var: partition
+
+- name: setup lvm
+  block:
+  - name: add {{ disk }}{{ item.index }} to the {{ item.lvm_group }} lvm group
+    community.general.lvg:
+      vg: "{{ item.lvm_group }}"
+      force: yes
+      pvs:
+        - "{{ disk }}{{ item.index }}"
+    loop: "{{ arch_partitions[disk] | sort(attribute='index') | flatten }}"
+    when: item.lvm_group is defined
+
+  - name: setup lvm volumes on the {{ item.lvm_group }} lvm group
+    community.general.lvol:
+      vg: "{{ item[0].lvm_group }}"
+      lv: "{{ item[1].lv }}"
+      size: "{{ item[1].size }}"
+    loop: "{{ arch_partitions[disk] |
+          subelements('lvm_partitions', skip_missing=True) }}"
+    when: item[0].lvm_group is defined
+
+  - name: append partition to the mount list
+    include_tasks: disks-order-mount-lvm.yml
+    loop: "{{ arch_partitions[disk] |
+                subelements('lvm_partitions', skip_missing=True) }}"
+    when: partition[0].lvm_group is defined and partition.mount is undefined
+    loop_control:
+      loop_var: partition
+
+- name: format volumes
+  community.general.filesystem:
+    dev: "{{ item.disk }}"
+    fstype: "{{ item.fs }}"
+    opts: "{{ item.fs_opts }}"
+    force: yes
+  loop: "{{ mount_order }}"
+
+- name: mount disks
+  include_tasks: disks-mount.yml
+  loop: "{{ mount_order | sort(attribute='order') }}"
+  loop_control:
+    loop_var: partition

@@ -1,0 +1,13 @@
+---
+
+- name: rank fastest mirrors
+  block:
+    - name: Install reflector
+      community.general.pacman:
+        name:
+          - reflector
+        update_cache: yes
+        state: present
+
+    - name: rank mirrors using reflector
+      command: reflector -l 100 -f 10 -c "{{ arch_proxy_country }}" -c "US" --sort rate --verbose --save /etc/pacman.d/mirrorlist

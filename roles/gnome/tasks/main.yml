@@ -1,0 +1,7 @@
+---
+
+- name: install x
+  include_tasks: xorg.yml
+
+- name: install gnome
+  include_tasks: gnome.yml

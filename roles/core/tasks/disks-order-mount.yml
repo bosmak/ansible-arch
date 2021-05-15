@@ -1,0 +1,24 @@
+---
+
+- name: add disks to the mount order list
+  block:
+
+    - name: calculate intermediate values for {{ partition.name }} partition on {{ disk }}
+      set_fact:
+        install_mount: "/mnt{{ partition.mount }}"
+        install_disk: "{{ disk }}{{ partition.index }}"
+        install_mount_index: "{{ partition.mount | length }}"
+        install_filesystem: "{{ partition.fs | default('ext4') }}"
+        install_filesystem_opts: "{{ partition.fs_opts | default('') }}"
+
+    - name: append {{ partition.name }} partition on {{ disk }} mount list
+      set_fact:
+        mount_order: "{{ mount_order + [
+                                        {
+                                          'order': install_mount_index,
+                                          'path': install_mount,
+                                          'disk': install_disk,
+                                          'fs': install_filesystem,
+                                          'fs_opts': install_filesystem_opts
+                                        }
+                                       ] }}"

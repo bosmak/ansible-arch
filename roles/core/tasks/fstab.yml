@@ -1,0 +1,19 @@
+---
+
+- name: Generate fstab
+  block:
+
+    - name: get uuid for the disk
+      command: blkid -s UUID -o value "{{ partition.disk }}"
+      register: disk_uuid
+      changed_when: false
+
+    - name: add {{ partition.disk }} to fstab
+      mount:
+        fstab: /mnt/etc/fstab
+        path: /
+        src: UUID={{ disk_uuid.stdout }}
+        fstype: "{{ partition.fs }}"
+        opts: defaults
+        #passno: '1'
+        state: present

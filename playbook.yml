@@ -1,0 +1,12 @@
+---
+
+- hosts: localhost
+  gather_facts: true
+  roles:
+    - core
+
+- hosts: chroot
+  gather_facts: true
+  roles:
+    - core
+    - gnome

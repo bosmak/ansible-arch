@@ -1,0 +1,6 @@
+- name: install
+  pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - xorg

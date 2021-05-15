@@ -1,0 +1,5 @@
+title    Arch Linux
+linux    /vmlinuz-linux
+# TODO: add ucode configuration here amd/intel
+initrd   /initramfs-linux.img
+options  root=UUID={{ root_disk_uuid.stdout }} rw

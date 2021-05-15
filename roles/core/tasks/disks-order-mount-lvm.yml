@@ -1,0 +1,24 @@
+---
+
+- name: add lvm disks to the mount order list
+  block:
+
+    - name: calculate intermediate values for {{ partition[1].lv }} partition on {{ disk }}
+      set_fact:
+        install_mount: "/mnt{{ partition[1].mount }}"
+        install_disk: "/dev/mapper/{{ partition[0].lvm_group }}-{{ partition[1].lv }}"
+        install_mount_index: "{{ partition[1].mount | length }}"
+        install_filesystem: "{{ partition[1].fs | default('ext4') }}"
+        install_filesystem_opts: "{{ partition[1].fs_opts | default('') }}"
+
+    - name: append {{ partition[1].lv }} partition on {{ disk }} mount list
+      set_fact:
+        mount_order: "{{ mount_order + [
+                                        {
+                                          'order': install_mount_index,
+                                          'path': install_mount,
+                                          'disk': install_disk,
+                                          'fs': install_filesystem,
+                                          'fs_opts': install_filesystem_opts
+                                        }
+                                       ] }}"

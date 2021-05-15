@@ -1,0 +1,122 @@
+---
+
+- name: abort when running outside the archlinux iso
+  fail:
+    msg: "Please boot from the ArchLinux ISO!"
+  when:
+    - ansible_nodename != 'archiso'
+    - ansible_facts['is_chroot'] is false
+  tags:
+    - install
+
+- name: create auxiliary variables
+  set_fact:
+    mount_order: []
+  when:
+    - ansible_facts['is_chroot'] is false
+  tags:
+    - install
+
+- name: sync clock using ntp
+  command: timedatectl set-ntp true
+  changed_when: false
+  when:
+    - ansible_facts['is_chroot'] is false
+  tags:
+    - install
+
+- name: format disks and mount disks
+  include_tasks: disks.yml
+  loop: "{{ arch_partitions | flatten | list }}"
+  loop_control:
+    loop_var: disk
+  when:
+    - ansible_facts['is_chroot'] is false
+  tags:
+    - install
+
+- name: rank mirrorlist
+  include_tasks: rank-mirrors.yml
+  tags:
+    - install
+    - chroot
+
+- name: install archlinux
+  command: "pacstrap /mnt {{ arch_pacstrap | join(' ') }}"
+  run_once: true
+  changed_when: true
+  when:
+    - ansible_facts['is_chroot'] is false
+  tags:
+    - install
+
+- name: generate blank fstab
+  command: genfstab -U /mnt >> /mnt/etc/fstab
+  changed_when: true
+  when:
+    - ansible_facts['is_chroot'] is false
+  tags:
+    - install
+
+- name: add volumes to fstab
+  include_tasks: fstab.yml
+  loop: "{{ mount_order | sort(attribute='order') }}"
+  loop_control:
+    loop_var: partition
+  when:
+    - ansible_facts['is_chroot'] is false
+  tags:
+    - install
+
+- name: set up timezone
+  include_tasks: timezone.yml
+  when:
+  - ansible_facts['is_chroot'] is true
+  tags:
+    - chroot
+
+- name: set up localization
+  include_tasks: localization.yml
+  when:
+  - ansible_facts['is_chroot'] is true
+  tags:
+    - chroot
+
+- name: configure network
+  include_tasks: network.yml
+  when:
+  - ansible_facts['is_chroot'] is true
+  tags:
+    - chroot
+
+- name: configure initramfs
+  include_tasks: initramfs.yml
+  when:
+  - ansible_facts['is_chroot'] is true
+  tags:
+    - chroot
+
+- name: set up bootloader
+  include_tasks: bootloader.yml
+  when:
+  - ansible_facts['is_chroot'] is true
+  tags:
+    - chroot
+
+- name: create user
+  include_tasks: user.yml
+  when:
+  - ansible_facts['is_chroot'] is true
+  tags:
+    - chroot
+
+- name: additional packages
+  community.general.pacman:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  loop: "{{ arch_additional_packages }}"
+  when:
+    - ansible_facts['is_chroot'] is true
+  tags:
+    - chroot
