@@ -32,6 +32,25 @@
     owner: root
     group: root
     state: link
-
   when:
     - ansible_facts['is_chroot'] is true
+
+- name: Disable wayland on gdm
+  ansible.builtin.lineinfile:
+    path: /etc/gdm/custom.conf
+    regexp: '^#WaylandEnable'
+    line: WaylandEnable=false
+
+- name: Disable some icons from the application list
+  ansible.builtin.lineinfile:
+    path: "/usr/share/applications/{{ item }}"
+    regexp: '^NoDisplay='
+    line: NoDisplay=true
+  loop:
+    - avahi-discover.desktop
+    - bssh.desktop
+    - bvnc.desktop
+    - lstopo.desktop
+    - gnome-nettool.desktop
+    - qv4l2.desktop
+    - qvidcap.desktop
