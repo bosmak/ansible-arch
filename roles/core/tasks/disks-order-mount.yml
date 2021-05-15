@@ -10,6 +10,16 @@
         install_mount_index: "{{ partition.mount | length }}"
         install_filesystem: "{{ partition.fs | default('ext4') }}"
         install_filesystem_opts: "{{ partition.fs_opts | default('') }}"
+      when: disk is search("sd")
+
+    - name: calculate intermediate values for {{ partition.name }} partition on nvm {{ disk }}
+      set_fact:
+        install_mount: "/mnt{{ partition.mount }}"
+        install_disk: "{{ disk }}p{{ partition.index }}"
+        install_mount_index: "{{ partition.mount | length }}"
+        install_filesystem: "{{ partition.fs | default('ext4') }}"
+        install_filesystem_opts: "{{ partition.fs_opts | default('') }}"
+      when: disk is search("nvme")
 
     - name: append {{ partition.name }} partition on {{ disk }} mount list
       set_fact:

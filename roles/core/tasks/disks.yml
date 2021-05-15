@@ -26,12 +26,12 @@
 
 - name: setup lvm
   block:
-  - name: add {{ disk }}{{ item.index }} to the {{ item.lvm_group }} lvm group
+  - name: add {{ disk }}1{{ item.index }} to the {{ item.lvm_group }} lvm group
     community.general.lvg:
       vg: "{{ item.lvm_group }}"
       force: yes
       pvs:
-        - "{{ disk }}{{ item.index }}"
+        - "{{ disk }}p{{ item.index }}"
     loop: "{{ arch_partitions[disk] | sort(attribute='index') | flatten }}"
     when: item.lvm_group is defined
 
