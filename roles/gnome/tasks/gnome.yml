@@ -24,3 +24,14 @@
     enabled: yes
   when:
     - ansible_facts['is_chroot'] is false
+
+- name: enable display manager service on start inside chroot
+  file:
+    path: /etc/systemd/system/display-manager.service
+    src: /usr/lib/systemd/system/gdm.service
+    owner: root
+    group: root
+    state: link
+
+  when:
+    - ansible_facts['is_chroot'] is true
