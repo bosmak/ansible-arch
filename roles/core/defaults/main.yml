@@ -11,7 +11,7 @@ arch_dns_servers:
 arch_dns_over_tls: yes
 
 arch_partitions:
-  /dev/sda:
+  /dev/nvme0n1:
     - {
         index: 1,
         name: boot,
