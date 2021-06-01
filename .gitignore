@@ -1,3 +1,6 @@
 # Packer folders
 packer_cache/
 output-*/
+
+# Test Artifacts
+archive.tar.gz
