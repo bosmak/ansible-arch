@@ -71,3 +71,6 @@ arch_user_groups:
   - storage
   - games
   - input
+  - tty
+
+arch_aur_build_user: build-user

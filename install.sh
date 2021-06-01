@@ -21,7 +21,7 @@ mount -o remount,size=1G /run/archiso/cowspace
 pacman -Sy ansible --needed --noconfirm
 
 # install ansible dependencies
-ansible-galaxy collection install community.general
+ansible-galaxy install -r requirements.yml
 
 # run ansible
 ansible-playbook ./playbook.yml -i /tmp/inventory 2>&1 | tee output.logs

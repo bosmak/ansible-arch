@@ -120,3 +120,8 @@
     - ansible_facts['is_chroot'] is true
   tags:
     - chroot
+
+- name: install aur helper
+  when:
+  - ansible_facts['is_chroot'] is true
+  include_tasks: aur.yml
