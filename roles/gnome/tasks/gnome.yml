@@ -54,3 +54,10 @@
     - gnome-nettool.desktop
     - qv4l2.desktop
     - qvidcap.desktop
+
+- name: install gnome-shell extension
+  become: yes
+  become_user: "{{ arch_aur_build_user }}"
+  aur:
+    name: "chrome-gnome-shell"
+    state: present
