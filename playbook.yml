@@ -9,4 +9,6 @@
   gather_facts: true
   roles:
     - core
-    - gnome
+    - xorg
+    - i3
+    #- gnome

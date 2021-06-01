@@ -1,0 +1,12 @@
+---
+
+- name: install
+  pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - xorg
+    - xorg-server
+    - xorg-xinit
+    - xorg-apps
+    - xterm
