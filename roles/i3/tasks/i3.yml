@@ -1,0 +1,33 @@
+---
+
+- name: install
+  pacman:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - i3-gaps
+    - i3status
+    - dmenu
+    - lightdm
+    - lightdm-gtk-greeter
+    - lightdm-gtk-greeter-settings
+    - feh
+    - picom
+
+- name: add loader configuration
+  ansible.builtin.template:
+    src: templates/xinitrc.j2
+    dest: "/home/{{ arch_user_name }}/.xinitrc"
+    owner: "{{ arch_user_name }}"
+    group: "{{ arch_user_name }}"
+
+- name: install from aur
+  become: yes
+  become_user: "{{ arch_aur_build_user }}"
+  aur:
+    name: "{{ item }}"
+    use: yay
+    state: present
+  loop:
+    - i3lock-color
+    - betterlockscreen

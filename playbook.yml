@@ -10,5 +10,6 @@
   roles:
     - core
     - xorg
+    # Desktop Environment & Windows Managers
     - i3
     #- gnome

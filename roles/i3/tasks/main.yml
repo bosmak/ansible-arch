@@ -1,0 +1,4 @@
+---
+
+- name: install i3
+  include_tasks: i3.yml
