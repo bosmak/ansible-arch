@@ -82,13 +82,6 @@
   tags:
     - chroot
 
-- name: configure network
-  include_tasks: network.yml
-  when:
-  - ansible_facts['is_chroot'] is true
-  tags:
-    - chroot
-
 - name: configure initramfs
   include_tasks: initramfs.yml
   when:

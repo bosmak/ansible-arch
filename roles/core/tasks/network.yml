@@ -42,11 +42,12 @@
 - name: configure network manager
   block:
 
-    - name: install network manager
+    - name: install
       pacman:
         name:  "{{ item }}"
         update_cache: yes
         state: present
+        extra_args: --noconfirm
       loop:
         - networkmanager
         - network-manager-applet
