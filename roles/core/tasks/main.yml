@@ -125,3 +125,10 @@
   when:
   - ansible_facts['is_chroot'] is true
   include_tasks: aur.yml
+
+- name: configure network
+  include_tasks: network.yml
+  when:
+  - ansible_facts['is_chroot'] is true
+  tags:
+    - chroot

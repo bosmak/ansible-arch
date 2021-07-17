@@ -24,4 +24,4 @@ pacman -Sy ansible --needed --noconfirm
 ansible-galaxy install -r requirements.yml
 
 # run ansible
-ansible-playbook ./playbook.yml -i /tmp/inventory 2>&1 | tee output.logs
+script --flush --quiet --return /tmp/ansible-output.txt --command "ansible-playbook ./playbook.yml -i /tmp/inventory"

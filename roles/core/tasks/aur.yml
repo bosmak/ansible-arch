@@ -1,35 +1,26 @@
 ---
-
-- name: configure sudoers
-  lineinfile:
-    dest: /etc/sudoers
-    regexp: '^%aur'
-    line: '%aur ALL=(ALL) NOPASSWD: /usr/bin/pacman'
-    validate: 'visudo -cf %s'
-    state: present
-
 - name: create the aur build group
   group:
     name: aur
     state: present
 
-- name: create aur build user
-  user:
-    name: "{{ arch_aur_build_user }}"
-    home: /tmp/"{{ arch_aur_build_user }}"/
-    create_home: no
-    system: yes
-    password_lock: yes
-    shell: /usr/sbin/nologin
-    groups:
-      - aur
+- name: configure sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: '^%aur'
+    line: '%aur ALL=(ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+    state: present
 
-- name: Create tmp folder for AUR builds
-  file:
-    path: /tmp/"{{ arch_aur_build_user }}"/
-    state: directory
-    mode: "0755"
-  changed_when: no
+- name: create aur build user
+  ansible.builtin.user:
+    name: "{{ arch_aur_build_user }}"
+    comment: "AUR Build User"
+    home: "/tmp/{{ arch_aur_build_user }}/"
+    create_home: false
+    groups: "aur"
+    append: yes
+    state: present
 
 - name: install aur basic dependencies
   pacman:
