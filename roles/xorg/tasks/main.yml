@@ -10,3 +10,6 @@
     - xorg-xinit
     - xorg-apps
     - xterm
+    - ttf-dejavu
+    - ttf-liberation
+    - noto-fonts

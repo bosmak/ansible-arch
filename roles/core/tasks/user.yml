@@ -14,9 +14,6 @@
     comment: "{{ arch_user_comment }}"
     password: "{{ arch_user_password }}"
     groups: "{{ arch_user_groups | join(',') }}"
-    #generate_ssh_key: yes
-    #ssh_key_bits: 4096
-    #ssh_key_file: .ssh/id_rsa
     append: yes
     state: present
 

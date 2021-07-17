@@ -3,7 +3,7 @@ arch_hostname: arch
 arch_timezone: America/Sao_Paulo
 arch_locale: en_US.UTF-8
 arch_keymap: us
-arch_proxy_country: BR
+arch_proxy_country: US
 
 arch_dns_servers:
   - "8.8.8.8#dns.google"
