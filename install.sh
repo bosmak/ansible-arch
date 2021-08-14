@@ -17,8 +17,10 @@ EOF
 # increase cowspace size
 mount -o remount,size=1G /run/archiso/cowspace
 
+rm -R /var/lib/pacman/sync/
+
 # install ansible
-pacman -Sy ansible --needed --noconfirm
+pacman -Syy --noconfirm && pacman -Sy ansible --needed --noconfirm
 
 # install ansible dependencies
 ansible-galaxy install -r requirements.yml
